@@ -4,8 +4,13 @@ import joblib
 from datetime import datetime
 
 # Load the trained model
-model = joblib.load("model.pkl")
+@st.cache_resource  # Caches the model so it loads faster
+def load_model():
+    with open("model.pkl", "rb") as file:
+        model = pickle.load(file)
+    return model
 
+model = load_model()
 # Title of the Streamlit app
 st.title("ARV Client Adherence Prediction")
 
