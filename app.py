@@ -2,13 +2,22 @@ import pickle
 import streamlit as st
 import numpy as np
 import pandas as pd
+import urllib.request
 
-# Load the trained model
-@st.cache_resource  # Caches the model so it loads faster
+# Correct GitHub raw URL
+MODEL_URL = "https://raw.githubusercontent.com/DoziemMetrics/Suppression_Prediction/main/model1.pkl"
+MODEL_PATH = "model1.pkl"
+
+@st.cache_resource  # Cache to avoid repeated downloads
 def load_model():
     try:
-        with open("model1.pkl", "rb") as file:
+        # Download model from GitHub
+        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+
+        # Load the model
+        with open(MODEL_PATH, "rb") as file:
             model = pickle.load(file)
+        
         return model
     except Exception as e:
         st.error(f"Error loading model: {e}")
