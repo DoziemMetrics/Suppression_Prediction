@@ -5,8 +5,8 @@ import pandas as pd
 import urllib.request
 
 # Correct GitHub raw URL
-MODEL_URL = "https://raw.githubusercontent.com/DoziemMetrics/Suppression_Prediction/main/model1.pkl"
-MODEL_PATH = "model1.pkl"
+MODEL_URL = "https://raw.githubusercontent.com/DoziemMetrics/Suppression_Prediction/main/model.pkl"
+MODEL_PATH = "model.pkl"
 
 @st.cache_resource  # Cache to avoid repeated downloads
 def load_model():
