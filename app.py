@@ -1,7 +1,7 @@
 import pickle
 import streamlit as st
 import numpy as np
-import panda as pd
+import pandas as pd
 
 # Load the trained model
 @st.cache_resource  # Caches the model so it loads faster
