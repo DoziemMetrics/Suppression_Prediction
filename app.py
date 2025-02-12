@@ -6,7 +6,7 @@ from datetime import datetime
 # Load the trained model
 @st.cache_resource  # Caches the model so it loads faster
 def load_model():
-    with open("model.pkl", "rb") as file:
+    with open("model1.pkl", "rb") as file:
         model = pickle.load(file)
     return model
 
