@@ -1,7 +1,6 @@
+import pickle
 import streamlit as st
-import pandas as pd
-import joblib
-from datetime import datetime
+import numpy as np
 
 # Load the trained model
 @st.cache_resource  # Caches the model so it loads faster
