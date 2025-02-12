@@ -54,6 +54,6 @@ input_data = pd.DataFrame({
 
 # Predict button
 if st.button("Predict"):
-    prediction = model.predict(input_data)
+    prediction = model1.predict(input_data)
     st.write(f"Predicted Outcome: {prediction[0]}")
 
