@@ -40,7 +40,7 @@ target_group_mapping = {"FSW": 0, "MSM": 1, "PWID": 2, "Others": 3}
 current_art_status_mapping = {"Active": 0, "IIT": 1}
 
 sex_encoded = encode_categorical(sex, sex_mapping)
-target_group_encoded = encode_categorical(target_group_mapping)
+target_group_encoded = encode_categorical(target_group, target_group_mapping)  
 current_art_status_encoded = encode_categorical(current_art_status, current_art_status_mapping)
 
 # Create a DataFrame for prediction
