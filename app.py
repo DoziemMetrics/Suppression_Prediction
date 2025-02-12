@@ -6,11 +6,16 @@ import pandas as pd
 # Load the trained model
 @st.cache_resource  # Caches the model so it loads faster
 def load_model():
-    with open("model1.pkl", "rb") as file:
-        model = pickle.load(file)
-    return model
+    try:
+        with open("model1.pkl", "rb") as file:
+            model = pickle.load(file)
+        return model
+    except Exception as e:
+        st.error(f"Error loading model: {e}")
+        return None
 
 model = load_model()
+
 # Title of the Streamlit app
 st.title("ARV Client Adherence Prediction")
 
@@ -35,7 +40,7 @@ target_group_mapping = {"FSW": 0, "MSM": 1, "PWID": 2, "Others": 3}
 current_art_status_mapping = {"Active": 0, "IIT": 1}
 
 sex_encoded = encode_categorical(sex, sex_mapping)
-target_group_encoded = encode_categorical(target_group, target_group_mapping)
+target_group_encoded = encode_categorical(target_group_mapping)
 current_art_status_encoded = encode_categorical(current_art_status, current_art_status_mapping)
 
 # Create a DataFrame for prediction
@@ -54,6 +59,10 @@ input_data = pd.DataFrame({
 
 # Predict button
 if st.button("Predict"):
-    prediction = model1.predict(input_data)
-    st.write(f"Predicted Outcome: {prediction[0]}")
+    if model is None:
+        st.error("Model is not loaded. Please check 'model1.pkl' and reload the app.")
+    else:
+        prediction = model.predict(input_data)
+        st.write(f"Predicted Outcome: {prediction[0]}")
+
 
