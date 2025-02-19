@@ -71,7 +71,7 @@ if st.button("Predict"):
     if model is None:
         st.error("Model is not loaded. Please check 'model1.pkl' and reload the app.")
     else:
-        prediction = model.predict(input_data)
+        prediction = model2.predict(input_data)
         st.write(f"Predicted Outcome: {prediction[0]}")
 
 
