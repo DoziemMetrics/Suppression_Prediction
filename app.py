@@ -23,6 +23,7 @@ def load_model():
         st.error(f"Error loading model: {e}")
         return None
 
+# Load the model
 model = load_model()
 
 # Title of the Streamlit app
@@ -69,9 +70,9 @@ input_data = pd.DataFrame({
 # Predict button
 if st.button("Predict"):
     if model is None:
-        st.error("Model is not loaded. Please check 'model1.pkl' and reload the app.")
+        st.error("Model is not loaded. Please check 'model2.pkl' and reload the app.")
     else:
-        prediction = model2.predict(input_data)
+        prediction = model.predict(input_data)  # Fixed: Using `model` instead of `model2`
         st.write(f"Predicted Outcome: {prediction[0]}")
 
 
