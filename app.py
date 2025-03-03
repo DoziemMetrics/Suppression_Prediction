@@ -1,78 +1,57 @@
-import pickle
 import streamlit as st
+import joblib
 import numpy as np
 import pandas as pd
-import urllib.request
 
-# Correct GitHub raw URL
-MODEL_URL = "https://raw.githubusercontent.com/DoziemMetrics/Suppression_Prediction/main/model2.pkl"
-MODEL_PATH = "model2.pkl"
+# Load the trained model
+model = joblib.load("model21.pkl")
 
-@st.cache_resource  # Cache to avoid repeated downloads
-def load_model():
-    try:
-        # Download model from GitHub
-        urllib.request.urlretrieve(MODEL_URL, MODEL_PATH)
+# App title
+st.title("HIV Viral Load Prediction App")
 
-        # Load the model
-        with open(MODEL_PATH, "rb") as file:
-            model = pickle.load(file)
-        
-        return model
-    except Exception as e:
-        st.error(f"Error loading model: {e}")
-        return None
+# Introduction
+st.write("""
+This application predicts the likelihood of HIV viral load suppression based on key patient data.
+By analyzing treatment history and lab results, the model provides insights to support clinical decision-making.
 
-# Load the model
-model = load_model()
+### Why is this important?
+HIV viral load suppression is critical in preventing disease progression and reducing transmission risks. By leveraging key patient information, this model helps healthcare providers identify individuals who may need additional support to achieve viral suppression.
+""")
 
-# Title of the Streamlit app
-st.title("ARV Client Adherence Prediction")
+# Feature explanations
+st.sidebar.header("Feature Descriptions")
+st.sidebar.write("""
+Each feature plays a significant role in predicting viral load suppression:
 
-# Input fields for user data
-sex = st.selectbox("Sex", ["Male", "Female"])
-target_group = st.selectbox("Target Group", ["FSW", "MSM", "PWID", "Others"])
-age = st.number_input("Age", min_value=0, max_value=100, step=1)
-current_art_status = st.selectbox("Current ART Status", ["Active", "IIT"])
-iit_count = st.number_input("IIT Count", min_value=0, step=1)
-refill_count = st.number_input("Refill Count", min_value=0, step=1)
-unsuppressed_count = st.number_input("Unsuppressed Count", min_value=0, step=1)
-result_count = st.number_input("Result Count", min_value=0, step=1)
-months_on_treatment = st.number_input("Months on Treatment", min_value=0, step=1)
-months_since_last_pickup = st.number_input("Months Since Last Pickup", min_value=0, step=1)
+- **Age** 🏥: The age of the patient in years. Age can impact immune response and adherence to treatment.
+- **IIT Count** ❌: The number of times the patient has experienced an interruption in treatment (IIT). Frequent interruptions can lead to drug resistance and treatment failure.
+- **Refill Count** 💊: The total number of ARV refills the patient has collected. More refills generally indicate better adherence to medication, improving suppression outcomes.
+- **Unsuppressed Count** 📉: The number of times a patient’s viral load was unsuppressed. A high count suggests challenges with adherence, resistance, or ineffective treatment.
+- **Result Count** 🧪: The total number of viral load test results available for the patient. Frequent monitoring ensures timely intervention when suppression is not achieved.
+- **Months on Treatment** 📆: The duration (in months) that the patient has been on ART. Longer treatment periods usually lead to improved viral suppression, provided adherence is maintained.
+- **Months Since Last Pickup** 🔄: The time elapsed (in months) since the patient last picked up their ARVs. A long gap could indicate non-adherence and a higher risk of viral rebound.
+""")
 
-# Convert categorical features to numerical
-def encode_categorical(value, mapping):
-    return mapping.get(value, -1)
+# User input
+age = st.number_input("Age", min_value=0, max_value=120, value=30)
+iit_count = st.number_input("IIT Count", min_value=0, value=0)
+refill_count = st.number_input("Refill Count", min_value=0, value=0)
+unsuppressed_count = st.number_input("Unsuppressed Count", min_value=0, value=0)
+result_count = st.number_input("Result Count", min_value=0, value=0)
+months_on_treatment = st.number_input("Months on Treatment", min_value=0, value=0)
+months_since_last_pickup = st.number_input("Months Since Last Pickup", min_value=0, value=0)
 
-sex_mapping = {"Male": 0, "Female": 1}
-target_group_mapping = {"FSW": 0, "MSM": 1, "PWID": 2, "Others": 3}
-current_art_status_mapping = {"Active": 0, "IIT": 1}
+# Prediction button
+if st.button("Predict Viral Load Suppression"):
+    # Ensure feature names match model training
+    feature_names = ["Age", "IIT Count", "Refill Count", "Unsuppressed Count", "Result Count", "Months on Treatment", "Months Since Last Pickup"]
+    input_df = pd.DataFrame([[age, iit_count, refill_count, unsuppressed_count, result_count, months_on_treatment, months_since_last_pickup]], 
+                            columns=feature_names)
 
-sex_encoded = encode_categorical(sex, sex_mapping)
-target_group_encoded = encode_categorical(target_group, target_group_mapping)  
-current_art_status_encoded = encode_categorical(current_art_status, current_art_status_mapping)
-
-# Create a DataFrame for prediction
-input_data = pd.DataFrame({
-    "Sex": [sex_encoded],
-    "Target group": [target_group_encoded],
-    "Age": [age],
-    "Current ART Status": [current_art_status_encoded],
-    "IIT Count": [iit_count],
-    "Refill Count": [refill_count],
-    "Unsuppressed Count": [unsuppressed_count],
-    "Result_Count": [result_count],
-    "Months on Treatment": [months_on_treatment],
-    "Months Since Last Pickup": [months_since_last_pickup]
-})
-
-# Predict button
-if st.button("Predict"):
-    if model is None:
-        st.error("Model is not loaded. Please check 'model2.pkl' and reload the app.")
+    # Make the prediction
+    prediction = model.predict(input_df)
+    
+    if prediction[0] == 1:
+        st.success("The patient is likely to have a suppressed viral load.")
     else:
-        prediction = model.predict(input_data)  # Fixed: Using `model` instead of `model2`
-        st.write(f"Predicted Outcome: {prediction[0]}")
-
-
+        st.warning("The patient may have an unsuppressed viral load. Consider further assessment and intervention.")
