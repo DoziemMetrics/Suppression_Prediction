@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 # Load the trained model
-model = joblib.load("model28.pkl")
+model = joblib.load("model21.pkl")
 
 # Define expected feature names
 expected_features = model.feature_names_in_
